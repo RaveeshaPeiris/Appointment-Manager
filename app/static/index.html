@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Appointment Manager</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Appointments</h1>
+    <button id="new-btn" class="btn primary" type="button">New appointment</button>
+  </header>
+
+  <main>
+    <section class="filters" aria-label="Search and filter">
+      <label>Patient name
+        <input id="f-search" type="search" placeholder="Search by name">
+      </label>
+      <label>Doctor
+        <select id="f-doctor"><option value="">All doctors</option></select>
+      </label>
+      <label>Type
+        <select id="f-type"><option value="">All types</option></select>
+      </label>
+      <label>Status
+        <select id="f-status"><option value="">All statuses</option></select>
+      </label>
+      <label>From
+        <input id="f-from" type="date">
+      </label>
+      <label>To
+        <input id="f-to" type="date">
+      </label>
+      <button id="clear-btn" class="btn" type="button">Clear filters</button>
+    </section>
+
+    <p id="count" class="count" aria-live="polite"></p>
+    <p id="banner" class="banner" role="alert" hidden></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date and time</th><th>Patient</th><th>Doctor</th>
+            <th>Type</th><th>Status</th><th><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p id="empty" class="empty" hidden></p>
+    </div>
+  </main>
+
+  <dialog id="form-dialog">
+    <form id="form" novalidate>
+      <h2 id="form-title">New appointment</h2>
+      <label>Patient name
+        <input name="patient_name" maxlength="100" required>
+        <span class="field-error" data-for="patient_name"></span>
+      </label>
+      <label>Date and time
+        <input name="appointment_time" type="datetime-local" required>
+        <span class="field-error" data-for="appointment_time"></span>
+      </label>
+      <label>Doctor
+        <select name="doctor" required></select>
+        <span class="field-error" data-for="doctor"></span>
+      </label>
+      <label>Appointment type
+        <select name="appointment_type" required></select>
+        <span class="field-error" data-for="appointment_type"></span>
+      </label>
+      <label>Status
+        <select name="status" required></select>
+        <span class="field-error" data-for="status"></span>
+      </label>
+      <p class="field-error" id="form-error"></p>
+      <div class="actions">
+        <button type="button" class="btn" id="cancel-btn">Cancel</button>
+        <button type="submit" class="btn primary">Save appointment</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="delete-dialog">
+    <form method="dialog">
+      <h2>Delete appointment?</h2>
+      <p id="delete-text"></p>
+      <div class="actions">
+        <button value="cancel" class="btn">Keep it</button>
+        <button value="confirm" class="btn danger">Delete appointment</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

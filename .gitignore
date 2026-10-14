@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+appointments.db
+.pytest_cache/
+venv/
