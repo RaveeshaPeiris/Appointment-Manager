@@ -38,6 +38,7 @@ Tests use a temporary database, so they never touch your real data.
 - **Search** by patient name, and **filter** by doctor, type, status and date range (filters combine)
 - Validation on both client (quick feedback) and server (authoritative)
 - **Double-booking protection:** a doctor cannot have two non-cancelled appointments at the same time (HTTP 409)
+- **No past bookings:** a *Scheduled* appointment must be in the future. Past dates are still allowed for records that already happened (Completed, No-show, Cancelled)
 
 ## Project structure
 
@@ -83,7 +84,6 @@ Appointment JSON:
 ## How I used AI
 
 I used Claude to generate the first version of the code, then reviewed it myself.
-*(Edit this section to describe what YOU actually did and found.)*
 
 **What I asked AI to do:** scaffold the Flask app, write the REST API, build the UI, and draft tests.
 
@@ -93,6 +93,7 @@ I used Claude to generate the first version of the code, then reviewed it myself
 - Checked that editing an appointment without changing its time is not flagged as a double-booking (needed an `ignore_id`).
 - Checked that a cancelled slot can be rebooked.
 - Manually tried the UI: create, edit, delete, each filter, empty state, validation errors.
+- Spotted myself that appointments could be scheduled in the past, and added a rule: Scheduled must be in the future, other statuses may be in the past. I also rewrote the tests to use dates relative to today, because hard-coded dates would start failing once they passed.
 
 ## Known limitations / next steps
 

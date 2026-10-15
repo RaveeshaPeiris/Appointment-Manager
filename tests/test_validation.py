@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from app.validation import validate_appointment
 
 
@@ -48,3 +50,22 @@ def test_status_defaults_to_scheduled(valid_payload):
 
 def test_non_dict_body_rejected():
     assert "_" in validate_appointment(["not", "a", "dict"])[1]
+
+FIXED_NOW = datetime(2026, 6, 1, 12, 0)
+
+
+def test_past_scheduled_rejected(valid_payload):
+    valid_payload["appointment_time"] = "2026-06-01T11:59"
+    assert "appointment_time" in validate_appointment(valid_payload, now=FIXED_NOW)[1]
+
+
+def test_future_scheduled_accepted(valid_payload):
+    valid_payload["appointment_time"] = "2026-06-01T12:01"
+    assert validate_appointment(valid_payload, now=FIXED_NOW)[1] == {}
+
+
+def test_past_allowed_for_non_scheduled_statuses(valid_payload):
+    valid_payload["appointment_time"] = "2026-05-01T09:00"
+    for status in ["Completed", "No-show", "Cancelled"]:
+        valid_payload["status"] = status
+        assert validate_appointment(valid_payload, now=FIXED_NOW)[1] == {}, status

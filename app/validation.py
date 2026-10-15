@@ -9,8 +9,12 @@ DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 MAX_NAME_LENGTH = 100
 
 
-def validate_appointment(data):
-    """Return (clean_data, errors). `errors` maps field name -> message."""
+def validate_appointment(data, now=None):
+    """Return (clean_data, errors). `errors` maps field name -> message.
+
+    `now` can be passed in so tests don't depend on the real clock.
+    """
+    now = now or datetime.now()
     if not isinstance(data, dict):
         return {}, {"_": "Request body must be a JSON object."}
 
@@ -25,8 +29,9 @@ def validate_appointment(data):
     clean["patient_name"] = name
 
     when = str(data.get("appointment_time", "")).strip()
+    parsed_time = None
     try:
-        datetime.strptime(when, DATETIME_FORMAT)
+        parsed_time = datetime.strptime(when, DATETIME_FORMAT)
     except ValueError:
         errors["appointment_time"] = "Date and time must look like 2026-11-05T14:30."
     clean["appointment_time"] = when
@@ -47,5 +52,14 @@ def validate_appointment(data):
     if status not in STATUSES:
         errors["status"] = f"Status must be one of: {', '.join(STATUSES)}."
     clean["status"] = status
+
+        # Business rule: a still-"Scheduled" appointment must be in the future.
+    # Past dates are fine for records that already happened (Completed, No-show, Cancelled).
+    if (parsed_time and clean["status"] == "Scheduled" and parsed_time < now
+            and "appointment_time" not in errors):
+        errors["appointment_time"] = (
+            "A scheduled appointment must be in the future. "
+            "Pick a later time, or set the status to Completed, No-show or Cancelled."
+        )
 
     return clean, errors
